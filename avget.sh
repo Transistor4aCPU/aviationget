@@ -36,27 +36,6 @@ cat $HOME/.avherald/planes/planetypes.md | while read CLINE; do
 	grep ${CLINE} $HOME/.avherald/crashs/rawdata.md >> $HOME/.avherald/planes/$CLINE/crashsraw.md
 	sort -u $HOME/.avherald/planes/$CLINE/crashsraw.md > $HOME/.avherald/planes/$CLINE/crashs.md
 done
-#for CLine in ${HOME/.avherald/planes/planetypes.md}
-#do
-#	echo $CLINE
-#	grep ${CLINE} $HOME/.avherald/accidents/rawdata.md >> $HOME/.avherald/planes/$CLINE/accidentsraw.md
-#	sort -u $HOME/.avherald/planes/$CLINE/accidentsraw.md > $HOME/.avherald/planes/$CLINE/accidents.md
-#done
-#grep $(ls -d $HOME/.avherald/planes/*/ | cut -f1 -d'/') $HOME/.avherald/accidents/rawdata.md
-#yad --title 'AVHerald' --button="Crashs" --button="Accidents" --button="Incidents"
-#sed -i 's/ /_/g' $HOME/.avherald/incidents/rawdata.md
-#sed 's/ at.*//g' $HOME/.avherald/crashs/rawdata.md | sed 's/ near.*//g'| sed 's/ enroute.*//g' | rev | cut -c 6- | rev | sed 's/ /_/g' >> $HOME/.avherald/airlines/airlinesraw.md
-#sed 's/ at.*//g' $HOME/.avherald/accidents/rawdata.md | sed 's/ near.*//g'| sed 's/ enroute.*//g' | rev | cut -c 6- | rev | sed 's/ /_/g' >> $HOME/.avherald/airlines/airlinesraw.md
-#sed 's/ at.*//g' $HOME/.avherald/incidents/rawdata.md | sed 's/ near.*//g'| sed 's/ enroute.*//g' | rev | cut -c 6- | rev | sed 's/ /_/g' >> $HOME/.avherald/airlines/airlinesraw.md
-#sed 's/ at.*//g' $HOME/.avherald/crashs/rawdata.md | sed 's/ near.*//g'| sed 's/ enroute.*//g' | awk 'NF>1{print $NF}' >> $HOME/.avherald/planes/planesraw.md
-#sed 's/ at.*//g' $HOME/.avherald/accidents/rawdata.md | sed 's/ near.*//g'| sed 's/ enroute.*//g' | awk 'NF>1{print $NF}' >> $HOME/.avherald/planes/planesraw.md
-#sed 's/ at.*//g' $HOME/.avherald/incidents/rawdata.md | sed 's/ near.*//g'| sed 's/ enroute.*//g' | awk 'NF>1{print $NF}' >> $HOME/.avherald/planes/planesraw.md
-#sort -u $HOME/.avherald/airlines/airlinesraw.md > $HOME/.avherald/airlines/airlines.md
-#sort -u $HOME/.avherald/planes/planesraw.md > $HOME/.avherald/planes/planes.md
-#cd $HOME/.avherald/airlines/
-#mkdir $(cat airlines.md)
-#cd $HOME/.avherald/planes/
-#mkdir $(cat planes.md)
 rm -r $HOME/.avherald/crashs/avherald.com
 rm -r $HOME/.avherald/accidents/avherald.com
 rm -r $HOME/.avherald/incidents/avherald.com
