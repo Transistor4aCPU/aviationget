@@ -1,0 +1,66 @@
+#!/bin/bash
+mkdir -p $HOME/.avget/
+mkdir -p $HOME/.avget/.crashs/
+mkdir -p $HOME/.avget/.incidents/
+mkdir -p $HOME/.avget/.accidents/
+mkdir -p $HOME/.avget/planes/
+mkdir -p $HOME/.avget/airlines/
+mkdir -p $HOME/.avget/crashs/
+mkdir -p $HOME/.avget/incidents/
+mkdir -p $HOME/.avget/accidents/
+cd $HOME/.avget/
+cd $HOME/.avget/.crashs/
+wget  -U 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.6) Gecko/20070802 SeaMonkey/1.1.4' -p -e robots=off --html-extension --convert-links http://avherald.com/h?list=&opt=7680
+cd $HOME/.avget/.accidents/
+wget  -U 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.6) Gecko/20070802 SeaMonkey/1.1.4' -p -e robots=off --html-extension --convert-links http://avherald.com/h?list=&opt=7424
+cd $HOME/.avget/.incidents/
+wget  -U 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.6) Gecko/20070802 SeaMonkey/1.1.4' -p -e robots=off --html-extension --convert-links http://avherald.com/h?list=&opt=6912
+cd $HOME/.avget/
+grep 'alt="Crash" title="Crash"' $HOME/.avget/.crashs/avherald.com/h\?list=.html | grep -o -P '(?<=class="headline_avherald">).*(?=</span>)|(?<="></td><td align="left"><a href=").*(?="><span class="headline_avherald">)'| tr '\n' ' ' | sed 's/http/\nhttp/g'| sed 's/&quot;/"/g' | tail -n +2 > $HOME/.avget/.crashs/rawdata.md
+grep 'alt="Accident" title="Accident"' $HOME/.avget/.accidents/avherald.com/h\?list=.html | grep -o -P '(?<=class="headline_avherald">).*(?=</span>)|(?<="></td><td align="left"><a href=").*(?="><span class="headline_avherald">)' | tr '\n' ' ' | sed 's/http/\nhttp/g'| sed 's/&quot;/"/g'| tail -n +2 > $HOME/.avget/.accidents/rawdata.md
+grep 'alt="Incident" title="Incident"' $HOME/.avget/.incidents/avherald.com/h\?list=.html | grep -o -P '(?<=class="headline_avherald">).*(?=</span>)|(?<="></td><td align="left"><a href=").*(?="><span class="headline_avherald">)' | tr '\n' ' ' | sed 's/http/\nhttp/g'| sed 's/&quot;/"/g' | tail -n +2 > $HOME/.avget/.incidents/rawdata.md
+rm -r $HOME/.avget/.crashs/avherald.com
+rm -r $HOME/.avget/.accidents/avherald.com
+rm -r $HOME/.avget/.incidents/avherald.com
+sort -u $HOME/.avget/.crashs/rawdata.md > $HOME/.avget/crashs/crashs.md
+sort -u $HOME/.avget/.accidents/rawdata.md > $HOME/.avget/accidents/accidents.md
+sort -u $HOME/.avget/.incidents/rawdata.md > $HOME/.avget/incidents/incidents.md
+sed 's/ at.*//g' $HOME/.avget/.accidents/rawdata.md | sed 's/ near.*//g'| sed 's/ enroute.*//g' | awk 'NF>1{print $NF}' >> $HOME/.avget/planes/planetypesraw.md
+sed 's/ at.*//g' $HOME/.avget/.incidents/rawdata.md | sed 's/ near.*//g'| sed 's/ enroute.*//g' | awk 'NF>1{print $NF}' >> $HOME/.avget/planes/planetypesraw.md
+sed 's/ at.*//g' $HOME/.avget/.crashs/rawdata.md | sed 's/ near.*//g'| sed 's/ enroute.*//g' | awk 'NF>1{print $NF}' >> $HOME/.avget/planes/planetypesraw.md
+sort -u $HOME/.avget/planes/planetypesraw.md > $HOME/.avget/planes/planetypes.md
+cut -f 2- -d ' ' $HOME/.avget/.accidents/rawdata.md | sed 's/ at.*//g' | sed 's/ near.*//g'| sed 's/ enroute.*//g' | rev | cut -c 6- | rev | sed 's/ /-/g' >> $HOME/.avget/airlines/airlinesraw.md
+cut -f 2- -d ' ' $HOME/.avget/.incidents/rawdata.md | sed 's/ at.*//g' | sed 's/ near.*//g'| sed 's/ enroute.*//g' | rev | cut -c 6- | rev | sed 's/ /-/g' >> $HOME/.avget/airlines/airlinesraw.md
+cut -f 2- -d ' ' $HOME/.avget/.crashs/rawdata.md | sed 's/ at.*//g' | sed 's/ near.*//g'| sed 's/ enroute.*//g' | rev | cut -c 6- | rev | sed 's/ /-/g' >> $HOME/.avget/airlines/airlinesraw.md
+sort -u $HOME/.avget/airlines/airlinesraw.md > $HOME/.avget/airlines/airlines.md
+cd $HOME/.avget/planes/
+mkdir -p $(cat $HOME/.avget/planes/planetypes.md)
+cat $HOME/.avget/planes/planetypes.md | while read ALINE; do
+	grep ${ALINE} $HOME/.avget/.accidents/rawdata.md >> $HOME/.avget/planes/$ALINE/accidentsraw.md
+	sort -u $HOME/.avget/planes/$ALINE/accidentsraw.md > $HOME/.avget/planes/$ALINE/accidents.md
+done
+cat $HOME/.avget/planes/planetypes.md | while read ILINE; do
+	grep ${ILINE} $HOME/.avget/.incidents/rawdata.md >> $HOME/.avget/planes/$ILINE/incidentsraw.md
+	sort -u $HOME/.avget/planes/$ILINE/incidentsraw.md > $HOME/.avget/planes/$ILINE/incidents.md
+done
+cat $HOME/.avget/planes/planetypes.md | while read CLINE; do
+	grep ${CLINE} $HOME/.avget/.crashs/rawdata.md >> $HOME/.avget/planes/$CLINE/crashsraw.md
+	sort -u $HOME/.avget/planes/$CLINE/crashsraw.md > $HOME/.avget/planes/$CLINE/crashs.md
+done
+cd $HOME/.avget/airlines/
+mkdir -p $(cat $HOME/.avget/airlines/airlines.md)
+cat $HOME/.avget/airlines/airlines.md | while read ALINE; do
+	grep ${ALINE} $HOME/.avget/.accidents/rawdata.md >> $HOME/.avget/airlines/$ALINE/accidentsraw.md
+	sort -u $HOME/.avget/airlines/$ALINE/accidentsraw.md > $HOME/.avget/airlines/$ALINE/accidents.md
+done
+cat $HOME/.avget/airlines/airlines.md | while read ILINE; do
+	grep ${ILINE} $HOME/.avget/.incidents/rawdata.md >> $HOME/.avget/airlines/$ILINE/incidentsraw.md
+	sort -u $HOME/.avget/airlines/$ILINE/incidentsraw.md > $HOME/.avget/airlines/$ILINE/incidents.md
+done
+cat $HOME/.avget/airlines/airlines.md | while read CLINE; do
+	grep ${CLINE} $HOME/.avget/.crashs/rawdata.md >> $HOME/.avget/airlines/$CLINE/crashsraw.md
+	sort -u $HOME/.avget/airlines/$CLINE/crashsraw.md > $HOME/.avget/airlines/$CLINE/crashs.md
+done
+yad --title 'AVGet' --borders=50 --text-align=center --text 'Select a category\n\n' --button="incidents" --button="accidents" --button="crashs" --button="planes" --button="airlines"
+
+exit
