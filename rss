@@ -25,5 +25,5 @@ done
 echo '</feed>' >> ~/.avget/feed.xml
 sed -i 's/href=/href="/g' ~/.avget/feed.xml
 sed -i 's/opt=6144/opt=6144"/g' ~/.avget/feed.xml
-#rm -r ~/.avget/avherald.com
+rm -r ~/.avget/avherald.com
 exit
