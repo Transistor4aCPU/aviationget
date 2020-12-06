@@ -1,0 +1,29 @@
+#!/bin/bash
+cd ~/.avget
+wget  -U 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.6) Gecko/20070802 SeaMonkey/1.1.4' -p -e robots=off --html-extension --convert-links http://avherald.com/h\?list\=\&opt\=6144
+cd avherald.com
+UPDATED=$(date --rfc-3339=seconds)
+grep '<table width="100%">' h\?list=\&opt=6144.html > cai.html
+echo -e '<?xml version="1.0" encoding="UTF-8" ?>\n<?xml-stylesheet href="/resources/xsl/atom_xsl.jsp" type="text/xsl"?>\n<feed xmlns="http://www.w3.org/2005/Atom">\n<title>The Aviation Herald</title>' > ~/.avget/feed.xml
+echo "<id>https://avherald.com</id>" >> ~/.avget/feed.xml
+echo "<updated>${UPDATED}</updated>" >> ~/.avget/feed.xml
+cat $HOME/.avget/avherald.com/cai.html | while read ALINE; do
+	LINK=$(echo "$ALINE" | grep -o -P '(?<=href=").*(?="><)')
+	TYPE=$(echo "$ALINE" | grep -o -P '(?<=title=").*(?="></td>)')
+	TITLE=$(echo "$ALINE" | grep -o -P '(?<=class="headline_avherald">).*(?=</span>)')
+	YDATE=$(echo "$TITLE" | grep -E -o ".{0,5}... 20..," | sed 's/,//g' | rev | grep -o "^.... " | rev)
+	MDATE=$(echo "$TITLE" | grep -E -o ".{0,5}... 20..," | sed 's/,//g' | sed 's/^ //g' | sed 's/Jan/01/g' | sed 's/Feb/02/g' | sed 's/Mar/03/g' | sed 's/Apr/04/g' | sed 's/May/05/g' | sed 's/Jun/06/g' | sed 's/Jul/07/g' | sed 's/Aug/08/g' | sed 's/Sep/09/g' | sed 's/Oct/10/g' | sed 's/Nov/11/g' | sed 's/Dec/12/g' | grep -o "^..")
+	DDATE=$(echo "$TITLE" | grep -E -o ".{0,5}... 20..," | sed 's/,//g' | rev | sed 's/^.... //g' | rev | sed 's/^ //g' | sed 's/^... //g' | sed 's/^1st/01/g' | sed 's/^2nd/02/g' | sed 's/^3rd/03/g' | sed 's/^4th/04/g' | sed 's/^5th/05/g' | sed 's/^6th/06/g' | sed 's/^7th/07/g' | sed 's/^8th/08/g' | sed 's/^9th/09/g' | grep -o '[0-9]*')
+#	echo -e "<entry>\n<title>${TITLE}</title>\n<link href=${LINK}/>\n<id>${LINK}</id>\n<updated>${date --rfc-3339=seconds}</updated>\n<category term=${TYPE}/>\n</entry>" >> ~/.avget/feed.xml
+	echo "<entry>" >> ~/.avget/feed.xml
+	echo "<title>${TITLE}</title>" >> ~/.avget/feed.xml
+	echo "<link href=${LINK}/>" >> ~/.avget/feed.xml
+	echo "<id>${LINK}</id>" >> ~/.avget/feed.xml
+	echo "<updated>${YDATE}-${MDATE}-${DDATE}</updated>" >> ~/.avget/feed.xml
+	echo "</entry>" >> ~/.avget/feed.xml
+done	
+echo '</feed>' >> ~/.avget/feed.xml
+sed -i 's/href=/href="/g' ~/.avget/feed.xml
+sed -i 's/opt=6144/opt=6144"/g' ~/.avget/feed.xml
+#rm -r ~/.avget/avherald.com
+exit
