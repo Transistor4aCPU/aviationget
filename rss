@@ -11,10 +11,10 @@ cat $HOME/.avget/avherald.com/cai.html | while read ALINE; do
 	LINK=$(echo "$ALINE" | grep -o -P '(?<=href=").*(?="><)' | sed 's/""/"/g')
 	TYPE=$(echo "$ALINE" | grep -o -P '(?<=title=").*(?="></td>)')
 	TITLE=$(echo "$ALINE" | grep -o -P '(?<=class="headline_avherald">).*(?=</span>)')
-	YDATE=$(echo "$TITLE" | grep -E -o ".{0,5}... 20..," | sed 's/,//g' | rev | grep -o "^.... " | rev)
+	YDATE=$(echo "$TITLE" | grep -E -o ".{0,5}... 20..," | sed 's/,//g' | rev | grep -o "^.... " | rev | sed 's/ //g')
 	MDATE=$(echo "$TITLE" | grep -E -o ".{0,5}... 20..," | sed 's/,//g' | sed 's/^ //g' | sed 's/Jan/01/g' | sed 's/Feb/02/g' | sed 's/Mar/03/g' | sed 's/Apr/04/g' | sed 's/May/05/g' | sed 's/Jun/06/g' | sed 's/Jul/07/g' | sed 's/Aug/08/g' | sed 's/Sep/09/g' | sed 's/Oct/10/g' | sed 's/Nov/11/g' | sed 's/Dec/12/g' | grep -o "^..")
 	DDATE=$(echo "$TITLE" | grep -E -o ".{0,5}... 20..," | sed 's/,//g' | rev | sed 's/^.... //g' | rev | sed 's/^ //g' | sed 's/^... //g' | sed 's/^1st/01/g' | sed 's/^2nd/02/g' | sed 's/^3rd/03/g' | sed 's/^4th/04/g' | sed 's/^5th/05/g' | sed 's/^6th/06/g' | sed 's/^7th/07/g' | sed 's/^8th/08/g' | sed 's/^9th/09/g' | grep -o '[0-9]*')
-	SUMMARY=$(w3m -dump_source "$LINK" | grep -o -P '(?<=span class="sitetext").*' | tail -n1 | sed 's/<br.*//g' | sed 's/>//g')
+	SUMMARY=$(w3m -dump_source "$LINK" |  grep -o -P '(?<=span class="sitetext").*(?=</span>)' | sed 's/<br>/\n/g' | sed 's/<br\/>/\n/g'| sed 's/>List by: <\/span><\/td><td width="80" align="left"><a href="\/h?list=&opt=\.\.\.\."><img class="frame" src="\/images\/occurence_off.jpg" alt="Sort list by Occurrence date" title="Sort list by Occurrence date" width=75 height=24><\/a><\/td><td class="frame" width="80" align="left"><a href="\/h?list=&opt=\.\.\.\."><img class="frame" src="\/images\/update.jpg" alt="List currently sorted by Update" title="List currently sorted by Update" width=75 height=24><\/a><\/td><td align="right" width="50"><span class="sitetext">Filter://g' | sed 1,4d | sed '/^</d' | sed '/<a/d' | sed 's/<i>//g' | sed 's/<\/i>//g' | sed 's/<\/b>//g' | sed 's/<b>//g' | sed 's/>//g')
 #	echo -e "<entry>\n<title>${TITLE}</title>\n<link href=${LINK}/>\n<id>${LINK}</id>\n<updated>${date --rfc-3339=seconds}</updated>\n<category term=${TYPE}/>\n</entry>" >> ~/.avget/feed.xml
 	echo "<entry>" >> ~/.avget/feed.xml
 	echo "<title>${TITLE}</title>" >> ~/.avget/feed.xml
